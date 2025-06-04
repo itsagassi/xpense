@@ -1,2 +1,70 @@
-# xpense
-A web application that allows users to manage and visualize expenses. The application have a REST API backend with gin frameworks for basic CRUD operations and a frontend application with React Framework to interact with the API and to visualize the data provided by the API.
+# 💸 Xpense
+
+**Xpense** is a full-stack web application that allows users to manage and visualize their expenses.  
+The backend is a REST API built with the **Gin** framework, while the frontend is developed using **React** for smooth interaction and data visualization.
+
+---
+
+## 🛠️ Backend Requirements
+
+**Tech Stack:**  
+- Framework: Gin (Go)  
+- Database: SQLite / PostgreSQL / MongoDB (your choice)
+
+### 🔧 REST API Features
+
+- ✅ Create a new expense
+- 📄 Read the list of expenses
+- 🔍 Read a single expense in detail
+- ✏️ Update an existing expense
+- ❌ Delete an expense
+
+### 🧾 Expense Object Schema
+
+| Field      | Type     | Description                         |
+|------------|----------|-------------------------------------|
+| `id`       | UUID     | Unique identifier                   |
+| `title`    | string   | Description of the expense          |
+| `amount`   | number   | Expense amount                      |
+| `category` | string   | e.g., food, travel, utilities, etc. |
+| `date`     | ISO date | Date of the expense                 |
+
+### 📡 API Guidelines
+
+- RESTful architecture
+- JSON responses
+- Proper HTTP status codes (`200`, `201`, `400`, `404`, etc.)
+
+---
+
+## 🌐 Frontend Requirements
+
+**Tech Stack:**  
+- Framework: React  
+- Charting Library: Chart.js / Recharts / D3.js (choose one)
+
+### 🖥️ Features
+
+- 📋 Display a list of expenses
+- ➕ Add new expenses
+- 📝 Edit and delete existing expenses
+- 🔍 Filter expenses by category
+- 📆 Summary pages for:
+  - Monthly expenses
+  - Weekly expenses
+- 📊 Visualize expenses using:
+  - Pie Chart or Bar Chart
+
+---
+
+## ⚙️ Bonus Technical Add-ons (Optional)
+
+- 🔐 Authentication (JWT or OAuth)
+- 📱 Responsive UI (mobile-first)
+- 🔄 State Management (Redux / Zustand / Context API)
+- ⛑️ TypeScript support for React
+- 📦 Deployment (Docker, Vercel, Render, etc.)
+
+---
+
+*Feel free to build and scale as you go—Xpense is designed to be as lightweight or feature-rich as you need.*
