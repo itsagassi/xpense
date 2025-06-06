@@ -60,8 +60,6 @@ The backend is a REST API built with the **Gin** framework, while the frontend i
 ## ⚙️ Bonus Technical Add-ons (Optional)
 
 - 🔐 Authentication (JWT or OAuth)
-- 📱 Responsive UI (mobile-first)
-- 🔄 State Management (Redux / Zustand / Context API)
 - ⛑️ TypeScript support for React
 - 📦 Deployment (Docker, Vercel, Render, etc.)
 
