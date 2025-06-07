@@ -1,0 +1,4 @@
+# Environment variables
+.env
+.env.*         # Ignore all variants like .env.local, .env.production, etc.
+!.env.example  # But keep a clean example for teammates
