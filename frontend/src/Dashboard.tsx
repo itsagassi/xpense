@@ -13,17 +13,21 @@ interface Expense {
   date: Date;
 }
 
-interface Datum {
+interface CategoryDatum {
   name: string;
   value: number;
+}
+interface TimeDatum {
+  name: string;
+  total: number;
 }
 
 export const Dashboard = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<string[]>(["All"]);
-  const [pieData, setPieData] = useState<Datum[]>([]);
-  const [barDataMonth, setBarDataMonth] = useState<Datum[]>([]);
-  const [barDataWeek, setBarDataWeek] = useState<Datum[]>([]);
+  const [pieData, setPieData] = useState<CategoryDatum[]>([]);
+  const [barDataMonth, setBarDataMonth] = useState<TimeDatum[]>([]);
+  const [barDataWeek, setBarDataWeek] = useState<TimeDatum[]>([]);
   const headers = {
     "Content-Type": "application/json",
     Authorization: localStorage.getItem("token") || "",
@@ -54,7 +58,7 @@ export const Dashboard = () => {
     try {
       const res = await fetch("http://localhost:5000/api/v1/expenses/categories", { headers });
       const response = await res.json();
-      const formatted: Datum[] = response.data || [];
+      const formatted: CategoryDatum[] = response.data || [];
       setPieData(formatted);
     } catch (error) {
       console.error("Error fetching category totals:", error);
@@ -65,7 +69,7 @@ export const Dashboard = () => {
     try {
       const res = await fetch("http://localhost:5000/api/v1/expenses/month", { headers });
       const response = await res.json();
-      const formatted: Datum[] = response.data || [];
+      const formatted: TimeDatum[] = response.data || [];
       setBarDataMonth(formatted);
     } catch (error) {
       console.error("Error fetching monthly totals:", error);
@@ -76,7 +80,7 @@ export const Dashboard = () => {
     try {
       const res = await fetch("http://localhost:5000/api/v1/expenses/week", { headers });
       const response = await res.json();
-      const formatted: Datum[] = response.data || [];
+      const formatted: TimeDatum[] = response.data || [];
       setBarDataWeek(formatted);
     } catch (error) {
       console.error("Error fetching weekly totals:", error);
