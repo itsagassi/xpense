@@ -18,7 +18,6 @@ type Expense struct {
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `json:"-" gorm:"index"`
 	
-	User     User     `json:"user,omitempty" gorm:"foreignKey:UserID"`
 	Category Category `json:"category,omitempty" gorm:"foreignKey:CategoryID"`
 }
 

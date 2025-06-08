@@ -15,7 +15,6 @@ type Category struct {
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `json:"-" gorm:"index"`
 	
-	User     *User     `json:"user,omitempty" gorm:"foreignKey:UserID"`
 	Expenses []Expense `json:"expenses,omitempty" gorm:"foreignKey:CategoryID"`
 }
 

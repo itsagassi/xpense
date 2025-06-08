@@ -36,7 +36,7 @@ func Migrate(db *gorm.DB) error {
 		return fmt.Errorf("failed to enable uuid extension: %w", err)
 	}
 
-	if err := db.AutoMigrate(&models.User{}, &models.Category{}, &models.Expense{}); err != nil {
+	if err := db.AutoMigrate(&models.Category{}, &models.Expense{}); err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 
