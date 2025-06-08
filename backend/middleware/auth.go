@@ -18,15 +18,15 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-func AuthMiddleware(secret string, skipAuth bool) gin.HandlerFunc {
+func AuthMiddleware(secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if skipAuth {
-            c.Set("user_id", uuid.MustParse("00000000-0000-0000-0000-000000000000"))
-            c.Set("user_email", "test@example.com")
-            c.Set("user_role", "tester")
-            c.Next()
-            return
-        }
+		// if skipAuth {
+        //     c.Set("user_id", uuid.MustParse("00000000-0000-0000-0000-000000000000"))
+        //     c.Set("user_email", "test@example.com")
+        //     c.Set("user_role", "tester")
+        //     c.Next()
+        //     return
+        // }
 
 		if secret == "" {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "JWT secret not configured"})

@@ -19,10 +19,6 @@ func main() {
                 log.Fatal("Failed to connect to database:", err)
         }
 
-        // if err := database.Migrate(db); err != nil {
-        //         log.Fatal("Failed to run migrations:", err)
-        // }
-
         router := gin.Default()
         router.Use(func(c *gin.Context) {
                 c.Header("Access-Control-Allow-Origin", "*")
@@ -42,21 +38,15 @@ func main() {
         })
 
         expenseHandler := handlers.NewExpenseHandler(db)
-        categoryHandler := handlers.NewCategoryHandler(db)
 
         protected := router.Group("/api/v1")
-        protected.Use(middleware.AuthMiddleware(cfg.SupabaseJWTSecret, true))
+        protected.Use(middleware.AuthMiddleware(cfg.SupabaseJWTSecret))
         {
                 protected.POST("/expenses", expenseHandler.CreateExpense)
                 protected.GET("/expenses", expenseHandler.GetExpenses)
                 protected.GET("/expenses/:id", expenseHandler.GetExpense)
                 protected.PUT("/expenses/:id", expenseHandler.UpdateExpense)
                 protected.DELETE("/expenses/:id", expenseHandler.DeleteExpense)
-
-                protected.POST("/categories", categoryHandler.CreateCategory)
-                protected.GET("/categories", categoryHandler.GetCategories)
-                protected.PUT("/categories/:id", categoryHandler.UpdateCategory)
-                protected.DELETE("/categories/:id", categoryHandler.DeleteCategory)
         }
 
         port := os.Getenv("PORT")

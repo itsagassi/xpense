@@ -1,0 +1,17 @@
+.dashboard-container {
+  padding: 2rem;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+.dashboard-container h2 {
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.chart-wrapper {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+}
