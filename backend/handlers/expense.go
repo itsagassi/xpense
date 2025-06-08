@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"time"
+        "fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -119,6 +120,105 @@ func (h *ExpenseHandler) GetExpense(c *gin.Context) {
 
 	c.JSON(http.StatusOK, utils.SuccessResponse("Expense retrieved successfully", expense))
 }
+
+func (h *ExpenseHandler) GetExpenseTotalPerCategories(c *gin.Context) {
+	userID, err := middleware.GetUserID(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("Unauthorized", err.Error()))
+		return
+	}
+
+	query := h.db.Table("expenses").
+		Select("category as name, SUM(amount) as value").
+		Where("user_id = ?", userID).
+		Group("category")
+
+	var results []struct {
+		Name  string  `json:"name"` 
+		Value float64 `json:"value"`
+	}
+
+	if err := query.Scan(&results).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("Failed to retrieve expense totals", err.Error()))
+		return
+	}
+	if len(results) == 0 {
+		c.JSON(http.StatusNotFound, utils.ErrorResponse("No expenses found", "You have no expenses recorded"))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.SuccessResponse("Expense totals per category retrieved successfully", results))
+}
+
+
+func (h *ExpenseHandler) GetExpenseTotalPerMonth(c *gin.Context) {
+	userID, err := middleware.GetUserID(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("Unauthorized", err.Error()))
+		return
+	}
+
+	query := h.db.Table("expenses").
+		Select("TO_CHAR(DATE_TRUNC('month', date), 'Mon') AS name, SUM(amount) AS total").
+		Where("user_id = ?", userID).
+		Group("name").
+		Order("MIN(date)")
+
+	var results []struct {
+		Name  string  `json:"name"` 
+		Total float64 `json:"total"` 
+	}
+
+	if err := query.Scan(&results).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("Failed to retrieve monthly totals", err.Error()))
+		return
+	}
+	if len(results) == 0 {
+		c.JSON(http.StatusNotFound, utils.ErrorResponse("No expenses found", "You have no expenses recorded"))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.SuccessResponse("Expense totals per month retrieved successfully", results))
+}
+
+func (h *ExpenseHandler) GetExpenseTotalPerWeek(c *gin.Context) {
+	userID, err := middleware.GetUserID(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("Unauthorized", err.Error()))
+		return
+	}
+
+	query := h.db.Table("expenses").
+		Select("EXTRACT(WEEK FROM date) AS week_num, SUM(amount) AS total").
+		Where("user_id = ?", userID).
+		Group("week_num").
+		Order("week_num")
+
+	var rawResults []struct {
+		WeekNum int     `json:"week_num"`
+		Total   float64 `json:"total"`
+	}
+
+	if err := query.Scan(&rawResults).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("Failed to retrieve weekly totals", err.Error()))
+		return
+	}
+	if len(rawResults) == 0 {
+		c.JSON(http.StatusNotFound, utils.ErrorResponse("No expenses found", "You have no expenses recorded"))
+		return
+	}
+
+	formatted := make([]map[string]interface{}, len(rawResults))
+	for i, r := range rawResults {
+		formatted[i] = map[string]interface{}{
+			"name":  fmt.Sprintf("Week %d", r.WeekNum),
+			"total": r.Total,
+		}
+	}
+
+	c.JSON(http.StatusOK, utils.SuccessResponse("Expense totals per week retrieved successfully", formatted))
+}
+
 
 func (h *ExpenseHandler) UpdateExpense(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)

@@ -47,6 +47,9 @@ func main() {
                 protected.GET("/expenses/:id", expenseHandler.GetExpense)
                 protected.PUT("/expenses/:id", expenseHandler.UpdateExpense)
                 protected.DELETE("/expenses/:id", expenseHandler.DeleteExpense)
+                protected.GET("/expenses/categories", expenseHandler.GetExpenseTotalPerCategories)
+                protected.GET("/expenses/month", expenseHandler.GetExpenseTotalPerMonth)
+                protected.GET("/expenses/week", expenseHandler.GetExpenseTotalPerWeek)
         }
 
         port := os.Getenv("PORT")

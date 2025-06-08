@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: gray;
+  background-color: #1e1e2f;
   color: white;
   padding: 1rem 2rem;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -15,7 +15,7 @@
 
 .logout-btn {
   background-color: white;
-  color: gray;
+  color: 1e1e2f;
   border: none;
   padding: 0.5rem 1rem;
   font-weight: bold;
