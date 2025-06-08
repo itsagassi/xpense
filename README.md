@@ -9,13 +9,13 @@ The backend is a REST API built with the **Gin** framework, while the frontend i
 
 **Tech Stack:**  
 - Framework: Gin (Go)  
-- Database: SQLite / PostgreSQL / MongoDB (your choice)
+- Database: PostgreSQL
 
 ### 🔧 REST API Features
 
 - ✅ Create a new expense
 - 📄 Read the list of expenses
-- 🔍 Read a single expense in detail
+- 🔍 Read a single expense in detail (not implemented to FE)
 - ✏️ Update an existing expense
 - ❌ Delete an expense
 
@@ -41,7 +41,7 @@ The backend is a REST API built with the **Gin** framework, while the frontend i
 
 **Tech Stack:**  
 - Framework: React  
-- Charting Library: Chart.js / Recharts / D3.js (choose one)
+- Charting Library: Recharts
 
 ### 🖥️ Features
 
@@ -57,11 +57,10 @@ The backend is a REST API built with the **Gin** framework, while the frontend i
 
 ---
 
-## ⚙️ Bonus Technical Add-ons (Optional)
+## ⚙️ Bonus Technical Add-ons
 
 - 🔐 Authentication (JWT or OAuth)
 - ⛑️ TypeScript support for React
-- 📦 Deployment (Docker, Vercel, Render, etc.)
 
 ---
 
