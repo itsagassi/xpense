@@ -18,6 +18,15 @@ interface Props {
 export const ExpensesTable = ({ expenses, fetchExpenses, categories }: Props) => {
   const [filter, setFilter] = useState("All");
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [viewDetail, setViewDetail] = useState(false);
+  const [detailForm, setDetailForm] = useState<Omit<Expense, "id">>({
+    title: "",
+    description: "",
+    category: "",
+    amount: 0,
+    date: new Date(),
+  });
+  
   const [editForm, setEditForm] = useState<Omit<Expense, "id">>({
     title: "",
     description: "",
@@ -64,6 +73,28 @@ export const ExpensesTable = ({ expenses, fetchExpenses, categories }: Props) =>
     }
   };
 
+  const viewDetailData = async (id: number) => {
+    setViewDetail(true);
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/v1/expenses/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.getItem("token") || "",
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch expense details");
+
+      const data = await res.json();
+      setDetailForm(data.data);
+    } catch (error) {
+      console.error("Error fetching expense details:", error);
+    }
+  };
+
+
   const cancelEdit = () => {
     setEditingId(null);
   };
@@ -90,134 +121,149 @@ export const ExpensesTable = ({ expenses, fetchExpenses, categories }: Props) =>
   const formatDateForInput = (date: Date) => date.toISOString().slice(0, 10);
 
   return (
-    <div style={styles.container}>
-      <h2>Expenses</h2>
+    <>
+      {viewDetail && (
+        <div style={ styles.container}>
+          <h3>Expense Details</h3>
+          <p><strong>Title:</strong> {detailForm.title}</p>
+          <p><strong>Description:</strong> {detailForm.description}</p>
+          <p><strong>Category:</strong> {detailForm.category}</p>
+          <p><strong>Amount:</strong> Rp {detailForm.amount}</p>
+          <p><strong>Date: </strong>{detailForm?.date && new Date(detailForm.date).toLocaleDateString()}</p>
+          <button onClick={() => setViewDetail(false)} style={styles.cancelBtn}>Close</button>
+        </div>
+      )}
+      <div style={styles.container}>
+        <h2>Expenses</h2>
 
-      <div style={styles.filterContainer}>
-        <label>
-          Filter by Category:{" "}
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            style={styles.select}
-          >
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div style={styles.filterContainer}>
+          <label>
+            Filter by Category:{" "}
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              style={styles.select}
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <table style={styles.table}>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Amount (Rp)</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredExpenses.map((exp) =>
+              editingId === exp.id ? (
+                <tr key={exp.id} style={styles.editRow}>
+                  <td style={styles.tableValue}>
+                    <input
+                      type="text"
+                      value={editForm.title}
+                      onChange={(e) =>
+                        setEditForm((f) => ({ ...f, title: e.target.value }))
+                      }
+                      style={styles.input}
+                    />
+                  </td>
+                  <td style={styles.tableValue}>
+                    <input
+                      type="text"
+                      value={editForm.description}
+                      onChange={(e) =>
+                        setEditForm((f) => ({ ...f, description: e.target.value }))
+                      }
+                      style={styles.input}
+                    />
+                  </td>
+                  <td style={styles.tableValue}>
+                    <select
+                      value={editForm.category}
+                      onChange={(e) =>
+                        setEditForm((f) => ({ ...f, category: e.target.value }))
+                      }
+                      style={styles.select}
+                    >
+                      {categories
+                        .filter((c) => c !== "All")
+                        .map((cat) => (
+                          <option key={cat} value={cat}>
+                            {cat}
+                          </option>
+                        ))}
+                    </select>
+                  </td>
+                  <td style={styles.tableValue}>
+                    <input
+                      type="number"
+                      value={editForm.amount}
+                      onChange={(e) =>
+                        setEditForm((f) => ({ ...f, amount: +e.target.value }))
+                      }
+                      style={styles.input}
+                      min={0}
+                    />
+                  </td>
+                  <td style={styles.tableValue}>
+                    <input
+                      type="date"
+                      value={formatDateForInput(editForm.date)}
+                      onChange={(e) =>
+                        setEditForm((f) => ({ ...f, date: new Date(e.target.value) }))
+                      }
+                      style={styles.input}
+                    />
+                  </td>
+                  <td style={styles.tableValue}>
+                    <button onClick={saveEdit} style={styles.saveBtn}>
+                      Save
+                    </button>
+                    <button onClick={cancelEdit} style={styles.cancelBtn}>
+                      Cancel
+                    </button>
+                  </td>
+                </tr>
+              ) : (
+                <tr key={exp.id}>
+                  <td onDoubleClick={() => viewDetailData(exp.id)} style={styles.tableValue}>
+                    {exp.title}
+                  </td>
+                  <td style={styles.tableValue}>{exp.description}</td>
+                  <td style={styles.tableValue}>{exp.category}</td>
+                  <td style={styles.tableValue}>{exp.amount}</td>
+                  <td style={styles.tableValue}>
+                    {new Date(exp.date).toLocaleDateString()}
+                  </td>
+                  <td style={styles.tableValue}>
+                    <button onClick={() => startEdit(exp)} style={styles.actionBtn}>
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => deleteExpense(exp.id)}
+                      style={{ ...styles.actionBtn, ...styles.deleteBtn }}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              )
+            )}
+          </tbody>
+        </table>
       </div>
-
-      <table style={styles.table}>
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>Amount (Rp)</th>
-            <th>Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredExpenses.map((exp) =>
-            editingId === exp.id ? (
-              <tr key={exp.id} style={styles.editRow}>
-                <td style={styles.tableValue}>
-                  <input
-                    type="text"
-                    value={editForm.title}
-                    onChange={(e) =>
-                      setEditForm((f) => ({ ...f, title: e.target.value }))
-                    }
-                    style={styles.input}
-                  />
-                </td>
-                <td style={styles.tableValue}>
-                  <input
-                    type="text"
-                    value={editForm.description}
-                    onChange={(e) =>
-                      setEditForm((f) => ({ ...f, description: e.target.value }))
-                    }
-                    style={styles.input}
-                  />
-                </td>
-                <td style={styles.tableValue}>
-                  <select
-                    value={editForm.category}
-                    onChange={(e) =>
-                      setEditForm((f) => ({ ...f, category: e.target.value }))
-                    }
-                    style={styles.select}
-                  >
-                    {categories
-                      .filter((c) => c !== "All")
-                      .map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
-                        </option>
-                      ))}
-                  </select>
-                </td>
-                <td style={styles.tableValue}>
-                  <input
-                    type="number"
-                    value={editForm.amount}
-                    onChange={(e) =>
-                      setEditForm((f) => ({ ...f, amount: +e.target.value }))
-                    }
-                    style={styles.input}
-                    min={0}
-                  />
-                </td>
-                <td style={styles.tableValue}>
-                  <input
-                    type="date"
-                    value={formatDateForInput(editForm.date)}
-                    onChange={(e) =>
-                      setEditForm((f) => ({ ...f, date: new Date(e.target.value) }))
-                    }
-                    style={styles.input}
-                  />
-                </td>
-                <td style={styles.tableValue}>
-                  <button onClick={saveEdit} style={styles.saveBtn}>
-                    Save
-                  </button>
-                  <button onClick={cancelEdit} style={styles.cancelBtn}>
-                    Cancel
-                  </button>
-                </td>
-              </tr>
-            ) : (
-              <tr key={exp.id}>
-                <td style={styles.tableValue}>{exp.title}</td>
-                <td style={styles.tableValue}>{exp.description}</td>
-                <td style={styles.tableValue}>{exp.category}</td>
-                <td style={styles.tableValue}>{exp.amount}</td>
-                <td style={styles.tableValue}>
-                  {new Date(exp.date).toLocaleDateString()}
-                </td>
-                <td style={styles.tableValue}>
-                  <button onClick={() => startEdit(exp)} style={styles.actionBtn}>
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => deleteExpense(exp.id)}
-                    style={{ ...styles.actionBtn, ...styles.deleteBtn }}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            )
-          )}
-        </tbody>
-      </table>
-    </div>
+    </>
   );
 };
 
